@@ -16,5 +16,6 @@ public:
 	virtual	int		IntersectDistance(Ray ray, float& distance) { return -1; }
 	LightIntensity	GetColor()	{ return color; }
 
+	virtual Vector	GetNormal(Vector point) { return Vector(0, 0, 1); }
 };
 

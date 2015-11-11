@@ -28,3 +28,8 @@ void	Scene::Add(std::vector<Mesh> meshes)
 		objs.push_back(&meshes[i]);
 	}
 }
+
+void	Scene::Add(PointLight* l)
+{
+	lights.push_back(l);
+}

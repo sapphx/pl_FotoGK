@@ -16,6 +16,7 @@ public:
 	LightIntensity	operator+(LightIntensity &li);
 	LightIntensity	operator-(LightIntensity &li);
 	LightIntensity	operator/(float num);
+	LightIntensity	operator*(LightIntensity &li);
 
 	LightIntensity	operator+=(LightIntensity &li);
 	LightIntensity	operator-=(LightIntensity &li);

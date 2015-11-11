@@ -174,3 +174,21 @@ void	Zadania::RunZad3()
 	//}
 	
 }
+
+void	Zadania::RunZad4()
+{
+	Scene scene = Scene();
+	Sphere	sp = Sphere(Vector(0, 0, 0), 1, LightIntensity(1, 1.0f, 1));
+	CameraPerspective camPersp = CameraPerspective(Vector(0, 0, -1.5f), Vector(0, 0, 1), 100000000000, 1, 1);
+	//CameraOrto	camOrto = CameraOrto(Vector(0,0,-20), Vector(0,0,1), 10.1f);
+	Picture picture = Picture(128, 128);
+
+	PointLight	light1 = PointLight(Vector(0, 2, 0), LightIntensity(1,0,1) );
+
+	scene.Add(&sp);
+	scene.Add(&light1);
+	
+	camPersp.Render(scene, picture);
+	picture.PrintToFile("zad4.bmp");
+
+}

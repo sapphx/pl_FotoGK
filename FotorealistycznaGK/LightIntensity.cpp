@@ -35,7 +35,10 @@ LightIntensity	LightIntensity::operator/(float num)
 	return LightIntensity(r / num, g / num, b / num);
 }
 
-
+LightIntensity	LightIntensity::operator*(LightIntensity &li)
+{
+	return LightIntensity(r * li.r, g * li.g, b * li.b);
+}
 
 LightIntensity	LightIntensity::operator+=(LightIntensity &li)
 {

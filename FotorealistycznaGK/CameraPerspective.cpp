@@ -242,6 +242,8 @@ LightIntensity	CameraPerspective::TestWithAllObjectsInScene(Scene& scene, Ray ra
 	float distance;
 	float temp = initialDistance;
 
+	int		impactedIter = -1;
+
 	for (int l = 0; l < scene.objs.size(); l++)
 	{
 		distance = initialDistance;
@@ -252,9 +254,39 @@ LightIntensity	CameraPerspective::TestWithAllObjectsInScene(Scene& scene, Ray ra
 			{
 				temp = distance;
 				tempColor = scene.objs[l]->innerColor;
+				impactedIter = l;
 			}
 		}
 	}
+
+	if (temp < initialDistance)
+	{
+		Vector	impactPos = temp * ray.direction + ray.origin;
+		float	NdotL = 0;
+		for (int k = 0; k < scene.lights.size(); k++)
+		{
+			Ray lightRay = Ray(impactPos, scene.lights[k]->position);
+			
+			for (int l = 0; l < scene.objs.size(); l++)
+			{
+				if (l == impactedIter)
+				{
+					NdotL = lightRay.direction.Dot(scene.objs[l]->GetNormal(lightRay.origin));
+					if (NdotL < 0) NdotL = 0;
+					tempColor = tempColor * scene.lights[k]->color * NdotL;//LightIntensity(0.5f, 0, 0);//temp * scene.lights[k]->color;
+					continue;
+				}
+				
+				distance = initialDistance;
+
+				if (scene.objs[l]->IntersectDistance(lightRay, distance) == 0)
+				{
+					tempColor = tempColor * scene.lights[k]->color;
+				}
+			}
+		}
+	}
+
 	return tempColor;
 }
 

@@ -18,6 +18,8 @@ public:
 
 	virtual	int		IntersectDistance(Ray ray, float& distance);
 
+	virtual Vector	GetNormal(Vector point) { return (point - center).NormalizeProduct(); }
+
 	//const int		_MISS = 0;
 	//const int		_ONE = 1;
 	//const int		_DOUBLE = 2;
