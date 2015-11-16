@@ -5,7 +5,7 @@ PointLight::PointLight()
 {
 }
 
-PointLight::PointLight(Vector _Position, LightIntensity _Light) : position(_Position), color(_Light)
+PointLight::PointLight(Vector _Position, LightIntensity _Light, float _Intensity) : position(_Position), color(_Light), intensity(_Intensity)
 {
 
 }

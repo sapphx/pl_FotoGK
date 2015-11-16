@@ -4,6 +4,7 @@
 #include "Shapes.h"
 #include "Mesh.h"
 #include "PointLight.h"
+#include "Material.h"
 
 class Scene
 {
@@ -11,6 +12,8 @@ public:
 
 	std::vector<Shape*> objs;
 	std::vector<PointLight*> lights;
+
+	Material	tempMaterial;
 
 	Scene();
 	~Scene();

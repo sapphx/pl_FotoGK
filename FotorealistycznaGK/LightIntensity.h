@@ -34,6 +34,8 @@ public:
 	void	Print();
 	void	PrintNL();
 
+	__forceinline	void	ClampColors() { if (r > 1) r = 1; if (g > 1) g = 1; if (b > 1) b = 1;}
+
 	static	LightIntensity	GetColorM16(int iter);
 
 	__forceinline	bool	TestProbleCornerWithCenter(LightIntensity corner, float difference) 

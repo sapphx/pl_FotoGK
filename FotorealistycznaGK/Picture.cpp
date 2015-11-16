@@ -86,6 +86,7 @@ void	Picture::SetPixel(int sx, int sy, LightIntensity li)
 {
 	if (sx >= 0 && sy >= 0 && sx < size.x && sy < size.y)
 	{
+		li.ClampColors();
 		image[sx][sy](li.r, li.g, li.b);
 	}
 }

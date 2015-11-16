@@ -1,5 +1,7 @@
 #pragma once
 
+#include <math.h>
+
 #include "Math.h"
 #include "Scene.h"
 #include "Picture.h"

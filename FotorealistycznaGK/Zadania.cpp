@@ -178,15 +178,17 @@ void	Zadania::RunZad3()
 void	Zadania::RunZad4()
 {
 	Scene scene = Scene();
-	Sphere	sp = Sphere(Vector(0, 0, 0), 1, LightIntensity(1, 1.0f, 1));
+	Sphere	sp = Sphere(Vector(0, 0, 0), 1, LightIntensity(0.1f, 0.1f, 0.1f));
 	CameraPerspective camPersp = CameraPerspective(Vector(0, 0, -1.5f), Vector(0, 0, 1), 100000000000, 1, 1);
 	//CameraOrto	camOrto = CameraOrto(Vector(0,0,-20), Vector(0,0,1), 10.1f);
-	Picture picture = Picture(128, 128);
+	Picture picture = Picture(64, 64);
 
-	PointLight	light1 = PointLight(Vector(0, 2, 0), LightIntensity(1,0,1) );
+	PointLight	light1 = PointLight(Vector(0, 1000.2f , 1000), LightIntensity(1,1,1), 10 );
+	PointLight	light2 = PointLight(Vector(1000, -1000, -200), LightIntensity(1, 0,	0), 100);
 
 	scene.Add(&sp);
-	scene.Add(&light1);
+	scene.Add(&light1); 
+	scene.Add(&light2);
 	
 	camPersp.Render(scene, picture);
 	picture.PrintToFile("zad4.bmp");

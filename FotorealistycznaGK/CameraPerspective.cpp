@@ -263,26 +263,49 @@ LightIntensity	CameraPerspective::TestWithAllObjectsInScene(Scene& scene, Ray ra
 	{
 		Vector	impactPos = temp * ray.direction + ray.origin;
 		float	NdotL = 0;
+		float	specular = 0;
+		Vector	R;
+		Vector	N;
+		Ray lightRay;
+		tempColor = scene.tempMaterial.ambient;
 		for (int k = 0; k < scene.lights.size(); k++)
 		{
-			Ray lightRay = Ray(impactPos, scene.lights[k]->position);
+			lightRay = Ray(impactPos, scene.lights[k]->position);
+			N = scene.objs[impactedIter]->GetNormal(lightRay.origin);
+			R = lightRay.direction - (N * N.Dot(lightRay.direction) * 2.0f);
+			//float LightIntensity = scene.lights[k]->intensity / (lightRay.distance * lightRay.distance);
+			distance = initialDistance;
 			
 			for (int l = 0; l < scene.objs.size(); l++)
 			{
 				if (l == impactedIter)
 				{
-					NdotL = lightRay.direction.Dot(scene.objs[l]->GetNormal(lightRay.origin));
-					if (NdotL < 0) NdotL = 0;
-					tempColor = tempColor * scene.lights[k]->color * NdotL;//LightIntensity(0.5f, 0, 0);//temp * scene.lights[k]->color;
+					//LightIntensity(0.5f, 0, 0);//temp * scene.lights[k]->color;
 					continue;
 				}
-				
-				distance = initialDistance;
+				scene.objs[l]->IntersectDistance(lightRay, distance);
 
-				if (scene.objs[l]->IntersectDistance(lightRay, distance) == 0)
+				//if (scene.objs[l]->IntersectDistance(lightRay, distance) > 0)
+				//{
+				//	//tempColor = tempColor * scene.lights[k]->color;
+				//}
+			}
+			
+			if (temp <= initialDistance) 
+			{
+				NdotL = lightRay.direction.Dot(N);
+				if (NdotL < 0) NdotL = 0;
+				specular = (-ray.direction).Dot(R);
+				if (specular < 0)
 				{
-					tempColor = tempColor * scene.lights[k]->color;
+					specular = 0;
 				}
+				else 
+				{
+					specular = powf(specular, scene.tempMaterial.specularPower);
+				}
+				tempColor +=	scene.tempMaterial.diffuse * scene.lights[k]->color * NdotL + 
+								scene.tempMaterial.specular * scene.lights[k]->color * specular;
 			}
 		}
 	}
