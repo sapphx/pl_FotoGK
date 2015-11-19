@@ -17,4 +17,6 @@ public:
 	void	RunZad2();
 	void	RunZad3();
 	void	RunZad4();
+	void	RunZad5();
+	void	RunZad6();
 };

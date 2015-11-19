@@ -5,7 +5,7 @@ Scene::Scene()
 {
 	objs = std::vector<Shape*>();
 	lights = std::vector<PointLight*>();
-	tempMaterial = Material (LightIntensity(0.3f, 0.3f, 0.3f), LightIntensity(0.7f, 0.7f, 0.7f), LightIntensity(0.9f, 1.0f, 0.9f), 32 );
+	tempMaterial = Material (LightIntensity(0.4f, 0.4f, 0.4f), LightIntensity(0.7f, 0.7f, 0.7f), LightIntensity(0.9f, 1.0f, 0.9f), 32 );
 }
 
 

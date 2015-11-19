@@ -24,6 +24,13 @@ Triangle::Triangle(Vector A, Vector B, Vector C, Vector N, LightIntensity Color)
 	innerColor = (Color);
 }
 
+Triangle::Triangle(Vector A, Vector B, Vector C, Vector N, LightIntensity Color, Vector2 TexA, Vector2 TexB, Vector2 TexC) 
+	: Shape(), a(A), b(B), c(C), ta(TexA), tb(TexB), tc(TexC)
+{
+	n = N.NormalizeProduct();
+	color = (Color);
+	innerColor = (Color);
+}
 Triangle::~Triangle()
 {
 }
@@ -66,4 +73,14 @@ int		Triangle::IntersectDistance(Ray ray, float& distance)
 
 	return __HIT_ONE;
 
+}
+
+void Triangle::ComputeUV(int & u, int & v, Vector hit, int size)
+{
+	float tU, tV, tW;
+	Barycentric(hit,a,b,c,tU,tV,tW);
+	u = ta.x * tU + tb.x * tV, tc.x * tW;
+	v = ta.y * tU + tb.y * tV, tc.y * tW;
+	u %= size;
+	v %= size;
 }

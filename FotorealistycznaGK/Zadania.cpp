@@ -194,3 +194,50 @@ void	Zadania::RunZad4()
 	picture.PrintToFile("zad4.bmp");
 
 }
+
+void	Zadania::RunZad5()
+{
+	int size = 64;
+	Picture texture = Picture(size, size);
+	int	tempI = 0, tempJ = 0;
+	int divider = size / 16;
+	for (int i = 0; i < size; i++)
+	{
+		tempI = i / divider;
+		for (int j = 0; j < size; j++)
+		{
+			tempJ = (j / divider + tempI) % 16;
+			texture.SetPixel(i, j, LightIntensity::GetColorM16(tempJ));
+		}
+	}
+
+	texture.PrintToFile("z5Tex.bmp");
+
+	// ###############
+
+	Scene scene = Scene();
+	Sphere	sp = Sphere(Vector(0, 0, 0), 1, LightIntensity(0.1f, 0.1f, 0.1f));
+	CameraPerspective camPersp = CameraPerspective(Vector(0, 0, -1.5f), Vector(0, 0, 1), 100000000000, 1, 1);
+	//CameraOrto	camOrto = CameraOrto(Vector(0,0,-20), Vector(0,0,1), 10.1f);
+	Picture picture = Picture(64, 64);
+
+	Triangle	t1 = Triangle(Vector(-1,0,0), Vector(1, 0, 0), Vector(0, 1, 0), Vector(0,0,1), LightIntensity::GetColorM16(2), Vector2(0, 0), Vector2(1000, 0), Vector2(500.0f, 1000));
+
+	scene.tempMaterial.texture = &texture;
+	scene.tempMaterial.texSize = size;
+
+	PointLight	light1 = PointLight(Vector(0, 1000.2f, 1000), LightIntensity(1, 1, 1), 10);
+
+	scene.Add(&sp);
+	//scene.Add(&t1);
+	scene.Add(&light1);
+
+	camPersp.Render(scene, picture);
+	picture.PrintToFile("zad5.bmp");
+
+}
+
+void	Zadania::RunZad6()
+{
+
+}

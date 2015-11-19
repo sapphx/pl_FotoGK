@@ -308,6 +308,9 @@ LightIntensity	CameraPerspective::TestWithAllObjectsInScene(Scene& scene, Ray ra
 								scene.tempMaterial.specular * scene.lights[k]->color * specular;
 			}
 		}
+		int u = 0, v = 0;
+		scene.objs[impactedIter]->ComputeUV(u, v, impactPos, scene.tempMaterial.texSize);
+		tempColor = tempColor * scene.tempMaterial.texture->GetPixel(u, v);
 	}
 
 	return tempColor;

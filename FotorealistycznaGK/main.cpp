@@ -15,7 +15,7 @@ int main()
 	
 
 	Zadania z = Zadania();
-	z.RunZad4();
+	z.RunZad5();
 
 	//Vector v = Vector(1, 1, 1);
 	//

@@ -50,6 +50,21 @@ int		Sphere::IntersectDistance(Ray ray, float &distance)
 	return retval;
 }
 
+void Sphere::ComputeUV(int & u, int & v, Vector hit, int size)
+{
+	Vector local = Vector(hit - center);
+	float theta = acos(local.y);
+	float phi = atan2(local.x, local.z);
+	if (phi < 0.0)
+		phi += _2PI;
+	// nastêpnie, konwertujemy theta i phi do (u, v) w [0, 1] X [0, 1]
+	float uF = phi * _I2PI;
+	float vF = 1.0 - theta * _IPI;
+	// na koñcu, przekszta³camy u oraz v wspó³rzêdnych texela
+	u = (int)((size - 1) * uF); // kolumna jest poziomo
+	v = (int)((size - 1) * vF);
+}
+
 
 int		Sphere::Intersect(Ray ray, float &distance, Vector& intesect1, Vector& intesect2)
 {

@@ -17,5 +17,6 @@ public:
 	LightIntensity	GetColor()	{ return color; }
 
 	virtual Vector	GetNormal(Vector point) { return Vector(0, 0, 1); }
+	virtual	void	ComputeUV(int &u, int &v, Vector hit, int size) {}
 };
 
