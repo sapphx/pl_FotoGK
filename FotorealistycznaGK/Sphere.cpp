@@ -7,7 +7,7 @@ Sphere::Sphere() : Shape(), center(Vector()), radius(0.0f)
 
 }
 
-Sphere::Sphere(Vector cent, float R, LightIntensity Color) : Shape(Color), center(cent), radius(R)
+Sphere::Sphere(Vector cent, float R, LightIntensity Color, int _MaterialID) : Shape(Color, _MaterialID), center(cent), radius(R)
 {
 
 }

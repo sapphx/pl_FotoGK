@@ -12,6 +12,7 @@ public:
 
 	std::vector<Shape*> objs;
 	std::vector<PointLight*> lights;
+	std::vector<Material*> materials;
 
 	Material	tempMaterial;
 
@@ -22,6 +23,6 @@ public:
 	void	Add(std::vector<Mesh> meshes);
 
 	void	Add(PointLight* l);
-
+	void	Add(Material* mat);
 };
 

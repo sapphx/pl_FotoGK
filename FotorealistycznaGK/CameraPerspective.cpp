@@ -266,51 +266,62 @@ LightIntensity	CameraPerspective::TestWithAllObjectsInScene(Scene& scene, Ray ra
 		float	specular = 0;
 		Vector	R;
 		Vector	N;
-		Ray lightRay;
-		tempColor = scene.tempMaterial.ambient;
-		for (int k = 0; k < scene.lights.size(); k++)
+		Ray		lightRay;
+		Material*	materialPointer = scene.materials[scene.objs[impactedIter]->materialId];
+		
+		switch (materialPointer->materialType)
 		{
-			lightRay = Ray(impactPos, scene.lights[k]->position);
-			N = scene.objs[impactedIter]->GetNormal(lightRay.origin);
-			R = lightRay.direction - (N * N.Dot(lightRay.direction) * 2.0f);
-			//float LightIntensity = scene.lights[k]->intensity / (lightRay.distance * lightRay.distance);
-			distance = initialDistance;
-			
-			for (int l = 0; l < scene.objs.size(); l++)
+		case (Diffuse):
+			tempColor = materialPointer->ambient;
+			for (int k = 0; k < scene.lights.size(); k++)
 			{
-				if (l == impactedIter)
-				{
-					//LightIntensity(0.5f, 0, 0);//temp * scene.lights[k]->color;
-					continue;
-				}
-				scene.objs[l]->IntersectDistance(lightRay, distance);
+				lightRay = Ray(impactPos, scene.lights[k]->position);
+				N = scene.objs[impactedIter]->GetNormal(lightRay.origin);
+				R = lightRay.direction - (N * N.Dot(lightRay.direction) * 2.0f);
+				//float LightIntensity = scene.lights[k]->intensity / (lightRay.distance * lightRay.distance);
+				distance = initialDistance;
 
-				//if (scene.objs[l]->IntersectDistance(lightRay, distance) > 0)
-				//{
-				//	//tempColor = tempColor * scene.lights[k]->color;
-				//}
-			}
-			
-			if (temp <= initialDistance) 
-			{
-				NdotL = lightRay.direction.Dot(N);
-				if (NdotL < 0) NdotL = 0;
-				specular = (-ray.direction).Dot(R);
-				if (specular < 0)
+				for (int l = 0; l < scene.objs.size(); l++)
 				{
-					specular = 0;
+					if (l == impactedIter)
+					{
+						//LightIntensity(0.5f, 0, 0);//temp * scene.lights[k]->color;
+						continue;
+					}
+					scene.objs[l]->IntersectDistance(lightRay, distance);
+
+					//if (scene.objs[l]->IntersectDistance(lightRay, distance) > 0)
+					//{
+					//	//tempColor = tempColor * scene.lights[k]->color;
+					//}
 				}
-				else 
+
+				if (temp <= initialDistance)
 				{
-					specular = powf(specular, scene.tempMaterial.specularPower);
+					NdotL = lightRay.direction.Dot(N);
+					if (NdotL < 0) NdotL = 0;
+					specular = (-ray.direction).Dot(R);
+					if (specular < 0)
+					{
+						specular = 0;
+					}
+					else
+					{
+						specular = powf(specular, materialPointer->specularPower);
+					}
+					tempColor += materialPointer->diffuse * scene.lights[k]->color * NdotL +
+						materialPointer->specular * scene.lights[k]->color * specular;
 				}
-				tempColor +=	scene.tempMaterial.diffuse * scene.lights[k]->color * NdotL + 
-								scene.tempMaterial.specular * scene.lights[k]->color * specular;
 			}
-		}
-		int u = 0, v = 0;
-		scene.objs[impactedIter]->ComputeUV(u, v, impactPos, scene.tempMaterial.texSize);
-		tempColor = tempColor * scene.tempMaterial.texture->GetPixel(u, v);
+			//int u = 0, v = 0;
+			//scene.objs[impactedIter]->ComputeUV(u, v, impactPos, scene.tempMaterial.texSize);
+			//tempColor = tempColor * scene.tempMaterial.texture->GetPixel(u, v);
+			break;
+		case (Reflective) : 
+			break;
+		};
+		
+		
 	}
 
 	return tempColor;

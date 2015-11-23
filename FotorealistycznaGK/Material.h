@@ -4,6 +4,13 @@
 #include "LightIntensity.h"
 #include "Picture.h"
 
+enum MaterialType
+{
+	Diffuse = 0,
+	Reflective,
+	Refractive
+};
+
 class Material
 {
 public:
@@ -11,6 +18,7 @@ public:
 	LightIntensity	diffuse;
 	LightIntensity	specular;
 	int				specularPower;
+	MaterialType	materialType;
 	//float	kDiffuse;
 	//float	kSpecular;
 	
@@ -18,7 +26,7 @@ public:
 	int				texSize;
 
 	Material();
-	Material(LightIntensity _Ambient, LightIntensity _Diffuse, LightIntensity _Specular, float _SpecPower);
+	Material(LightIntensity _Ambient, LightIntensity _Diffuse, LightIntensity _Specular, float _SpecPower, MaterialType _MaterialType);
 	~Material();
 
 	void	SetTexture();

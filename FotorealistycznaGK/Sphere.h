@@ -17,7 +17,7 @@ public:
 	float	radius;
 
 	Sphere();
-	Sphere(Vector cent, float R, LightIntensity Color = LightIntensity(1));
+	Sphere(Vector cent, float R, LightIntensity Color = LightIntensity(1), int _MaterialID = 0);
 	~Sphere();
 
 	//int		Intersect(Ray ray, float &distance);

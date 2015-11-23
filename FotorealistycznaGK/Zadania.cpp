@@ -239,5 +239,19 @@ void	Zadania::RunZad5()
 
 void	Zadania::RunZad6()
 {
+	Scene scene = Scene();
+	Sphere	sp = Sphere(Vector(0, 0, 0), 1, LightIntensity(0.1f, 0.1f, 0.1f), 0);
+	CameraPerspective camPersp = CameraPerspective(Vector(0, 0, -1.5f), Vector(0, 0, 1), 100000000000, 1, 1);
+	Picture picture = Picture(64, 64);
+
+	PointLight	light1 = PointLight(Vector(0, 1000.2f, 1000), LightIntensity(1, 1, 1), 10);
+	Material	material1 = Material(LightIntensity(0.3f, 0.3f, 0.3f), LightIntensity(0.5f, 0.5f, 0.5f), LightIntensity(0.0f, 1.0f, 0.9f), 32, MaterialType::Diffuse);
+
+	scene.Add(&sp);
+	scene.Add(&light1);
+	scene.Add(&material1);
+
+	camPersp.Render(scene, picture);
+	picture.PrintToFile("zad6.bmp");
 
 }
