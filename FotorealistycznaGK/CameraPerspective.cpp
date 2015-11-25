@@ -12,7 +12,7 @@ CameraPerspective::CameraPerspective()
 	compute_uwv();
 }
 
-CameraPerspective::CameraPerspective(Vector Position, Vector Target, float FarPlane, float NearPlane, int AaIterations)
+CameraPerspective::CameraPerspective(Vector Position, Vector Target, float FarPlane, float NearPlane, int AaIterations, int ReflectiveIterations)
 {
 	position = Position;
 	target = Target.NormalizeProduct();
@@ -22,6 +22,7 @@ CameraPerspective::CameraPerspective(Vector Position, Vector Target, float FarPl
 	fov = 1;
 	aaIterations = AaIterations;
 	compute_uwv();
+	reflectiveIterations = ReflectiveIterations;
 }
 
 CameraPerspective::~CameraPerspective()
@@ -31,7 +32,7 @@ CameraPerspective::~CameraPerspective()
 
 __forceinline	void	CameraPerspective::compute_uwv()
 {
-	//I SUPPOSE TARGET IS NORMALIZED - it should be, unless You really want it will be 
+	//I SUPPOSE TARGET IS NORMALIZED - it should be, unless You really want it will be
 	w = -target;
 	u = -up.Cross(w);
 	v = w.Cross(u);
@@ -79,7 +80,9 @@ void	CameraPerspective::Render(Scene& scene, Picture& picture)
 		//		}
 		//
 		//	}
-		
+
+			_pxWidth = pxWidth;
+			_pxHeight = pxHeight;
 
 			picture.SetPixel(i, j, AAProbing(scene, pointOnPlane, initialDistance, pxWidth, pxHeight, aaIterations, 0.05f));
 
@@ -99,12 +102,12 @@ __forceinline Vector2	CameraPerspective::GetPXWorldCenter(int x, int y, float px
 }
 
 
-LightIntensity	CameraPerspective::AAProbing(Scene& scene, Vector pointOnPlane, float initialDistance, float pixelWidth, float pixelHeight, int iterationsLeft, float difference, EProbes phase, LightIntensity corner1v2, LightIntensity corner3v4)
+LightIntensity	CameraPerspective::AAProbing(Scene& scene, Vector pointOnPlane, float initialDistance, float pixelWidth, float pixelHeight, int iterationsLeft, float difference, EProbes phase, LightIntensity corner1v2, LightIntensity corner3v4, MaterialType materialType, Vector reflectionDirection, int reflectiveIgnore)
 {
 	int iterLeft = iterationsLeft - 1;
 
 	const	float	iDistance = initialDistance;
-	LightIntensity	center = LightIntensity();
+	LightIntensity	center	= LightIntensity();
 	LightIntensity	corner1 = LightIntensity();
 	LightIntensity	corner2 = LightIntensity();
 	LightIntensity	corner3 = LightIntensity();
@@ -114,39 +117,51 @@ LightIntensity	CameraPerspective::AAProbing(Scene& scene, Vector pointOnPlane, f
 	float halfHeight = pixelHeight * 0.5f;
 
 	Vector	tempVector = Vector();
-
-	center = TestWithAllObjectsInScene(scene, Ray(pointOnPlane, initialDistance, pointOnPlane - position), iDistance);
-
-	if (phase == EProbes::Corner1n4)
+	Vector	testingDirection;
+	if (materialType == Diffuse)
 	{
-		corner1 = corner1v2;
-		corner4 = corner3v4;
+		testingDirection = (pointOnPlane - position).NormalizeProduct();
 	}
 	else
 	{
-		initialDistance = iDistance;
-		tempVector = pointOnPlane - u * halfWidth - v * halfHeight;
-		corner1 = TestWithAllObjectsInScene(scene, Ray(tempVector, initialDistance, tempVector - position), iDistance);
-
-		initialDistance = iDistance;
-		tempVector = pointOnPlane + u * halfWidth + v * halfHeight;
-		corner4 = TestWithAllObjectsInScene(scene, Ray(tempVector, initialDistance, tempVector - position), iDistance);
+		testingDirection = reflectionDirection;
 	}
 
-	if (phase == EProbes::Corner2n3)
-	{
-		corner2 = corner1v2;
-		corner3 = corner3v4;
-	}
-	else
-	{
-		initialDistance = iDistance;
-		tempVector = pointOnPlane + u * halfWidth - v * halfHeight;
-		corner2 = TestWithAllObjectsInScene(scene, Ray(tempVector, initialDistance, tempVector - position), iDistance);
+	center = TestWithAllObjectsInScene(scene, Ray(pointOnPlane, initialDistance, testingDirection), iDistance, materialType, reflectiveIgnore);
 
-		initialDistance = iDistance;
-		tempVector = pointOnPlane - u * halfWidth + v * halfHeight;
-		corner3 = TestWithAllObjectsInScene(scene, Ray(tempVector, initialDistance, tempVector - position), iDistance);
+	if (iterLeft >= 0)
+	{
+		if (phase == EProbes::Corner1n4)
+		{
+			corner1 = corner1v2;
+			corner4 = corner3v4;
+		}
+		else
+		{
+			initialDistance = iDistance;
+			tempVector = pointOnPlane - u * halfWidth - v * halfHeight;
+			corner1 = TestWithAllObjectsInScene(scene, Ray(tempVector, initialDistance, testingDirection), iDistance, materialType, reflectiveIgnore);
+
+			initialDistance = iDistance;
+			tempVector = pointOnPlane + u * halfWidth + v * halfHeight;
+			corner4 = TestWithAllObjectsInScene(scene, Ray(tempVector, initialDistance, testingDirection), iDistance, materialType, reflectiveIgnore);
+		}
+
+		if (phase == EProbes::Corner2n3)
+		{
+			corner2 = corner1v2;
+			corner3 = corner3v4;
+		}
+		else
+		{
+			initialDistance = iDistance;
+			tempVector = pointOnPlane + u * halfWidth - v * halfHeight;
+			corner2 = TestWithAllObjectsInScene(scene, Ray(tempVector, initialDistance, testingDirection), iDistance, materialType, reflectiveIgnore);
+
+			initialDistance = iDistance;
+			tempVector = pointOnPlane - u * halfWidth + v * halfHeight;
+			corner3 = TestWithAllObjectsInScene(scene, Ray(tempVector, initialDistance, testingDirection), iDistance, materialType, reflectiveIgnore);
+		}
 	}
 
 	//switch (phase)
@@ -171,7 +186,7 @@ LightIntensity	CameraPerspective::AAProbing(Scene& scene, Vector pointOnPlane, f
 	//
 	//	break;
 	//case Corner1n4:
-	//	
+	//
 	//	corner1 = corner1v2;
 	//	corner4 = corner3v4;
 	//
@@ -236,17 +251,22 @@ LightIntensity	CameraPerspective::AAProbing(Scene& scene, Vector pointOnPlane, f
 }
 
 
-LightIntensity	CameraPerspective::TestWithAllObjectsInScene(Scene& scene, Ray ray, float initialDistance)
+LightIntensity	CameraPerspective::TestWithAllObjectsInScene(Scene& scene, Ray ray, float initialDistance, bool	wasReflective, int reflectiveIgnore)
 {
 	LightIntensity tempColor = LightIntensity(0);
 	float distance;
 	float temp = initialDistance;
 
-	int		impactedIter = -1;
+	int		impactedIter = reflectiveIgnore;
 
 	for (int l = 0; l < scene.objs.size(); l++)
 	{
 		distance = initialDistance;
+
+		if (l == impactedIter)
+		{
+			continue;
+		}
 
 		if (scene.objs[l]->IntersectDistance(ray, distance) > 0)
 		{
@@ -268,16 +288,19 @@ LightIntensity	CameraPerspective::TestWithAllObjectsInScene(Scene& scene, Ray ra
 		Vector	N;
 		Ray		lightRay;
 		Material*	materialPointer = scene.materials[scene.objs[impactedIter]->materialId];
-		
+		LightIntensity ambientFragment = LightIntensity(0);
+
 		switch (materialPointer->materialType)
 		{
 		case (Diffuse):
-			tempColor = materialPointer->ambient;
+		case (Haxative):
+			ambientFragment = materialPointer->ambient * (1.0f / (float) scene.lights.size());
+			tempColor = LightIntensity(0);
 			for (int k = 0; k < scene.lights.size(); k++)
 			{
 				lightRay = Ray(impactPos, scene.lights[k]->position);
 				N = scene.objs[impactedIter]->GetNormal(lightRay.origin);
-				R = lightRay.direction - (N * N.Dot(lightRay.direction) * 2.0f);
+				R = (N * N.Dot(lightRay.direction) * 2.0f) - lightRay.direction;
 				//float LightIntensity = scene.lights[k]->intensity / (lightRay.distance * lightRay.distance);
 				distance = initialDistance;
 
@@ -309,19 +332,49 @@ LightIntensity	CameraPerspective::TestWithAllObjectsInScene(Scene& scene, Ray ra
 					{
 						specular = powf(specular, materialPointer->specularPower);
 					}
-					tempColor += materialPointer->diffuse * scene.lights[k]->color * NdotL +
-						materialPointer->specular * scene.lights[k]->color * specular;
+
+					float attenuation;
+					if (materialPointer->materialType == Diffuse)
+					{
+						attenuation = distance / scene.lights[k]->intensity;
+					}
+					else
+					{
+						attenuation = scene.lights[k]->intensity / (1.5f * distance);
+					}
+
+					tempColor += ambientFragment * attenuation +
+						(materialPointer->diffuse * scene.lights[k]->color * NdotL ) * attenuation +
+						(materialPointer->specular * scene.lights[k]->color * specular) * attenuation;
 				}
 			}
 			//int u = 0, v = 0;
 			//scene.objs[impactedIter]->ComputeUV(u, v, impactPos, scene.tempMaterial.texSize);
 			//tempColor = tempColor * scene.tempMaterial.texture->GetPixel(u, v);
 			break;
-		case (Reflective) : 
+		case (Reflective) :
+
+			if (wasReflective != Reflective)
+			{
+				N = scene.objs[impactedIter]->GetNormal(impactPos);
+				R = R = (N * N.Dot(-ray.direction) * 2.0f) + ray.direction;//N;	//2 * N + ray.direction; //R = (N * N.Dot(-ray.direction) * 2.0f) + ray.direction;
+				tempColor = AAProbing(scene, impactPos, initialDistance, _pxWidth, _pxHeight, aaIterations, 0.05f, Start, LightIntensity(0), LightIntensity(0), Reflective, R, impactedIter);
+			}
+			else
+			{
+				tempColor = materialPointer->ambient;
+			}
+			break;
+		case (Refractive) :
+
+			Vector temp = Vector(0);
+			Vector testDir = -scene.objs[impactedIter]->GetNormal(impactPos);//ray.direction;
+			testDir = (testDir * 4 + ray.direction).NormalizeProduct();
+			scene.objs[impactedIter]->IntersectWithBackfaces(Ray(impactPos, 10000000, testDir), temp);//(testDir * 2 + ray.direction).NormalizeProduct()), temp );
+			tempColor = AAProbing(scene, temp, initialDistance, _pxWidth, _pxHeight, aaIterations, 0.05f, Start, LightIntensity(0), LightIntensity(0), Refractive, (scene.objs[impactedIter]->GetNormal(temp)*3 - ray.direction ).NormalizeProduct(), impactedIter);
+
 			break;
 		};
-		
-		
 	}
 
 	return tempColor;

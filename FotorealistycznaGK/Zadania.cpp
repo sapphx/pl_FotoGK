@@ -7,13 +7,13 @@ using namespace std;
 void	Zadania::RunZad1()
 {
 	//Z1 - implementacja - DONE
-	
+
 	//Z2
 	Sphere S = Sphere(Vector(0), 10);
 
 	//Z3
 	Ray	R1 = Ray(Vector(0, 0, -20), (S.center - Vector(0, 0, -20)).NormalizeProduct());
-	
+
 	//Z4
 	Ray	R2 = Ray(Vector(0, 0, -20), 1000000, Vector(0, 1, 0));
 
@@ -55,7 +55,7 @@ void	Zadania::RunZad1()
 			r1Intersect2.PrintNL();
 		}
 	}
-	
+
 
 	//Z7
 	Plane P = Plane(Vector(0,1,1), Vector(0));
@@ -94,7 +94,7 @@ void	Zadania::RunZad2()
 	Sphere sp1 = Sphere(Vector(0, 0, 100), 2.0f, LightIntensity(0.5f));
 	Sphere sp2 = Sphere(Vector(2, 0, 102.0f), 2.5f, LightIntensity(1.0f));
 	Sphere sp3 = Sphere(Vector(-2, 0, 100.5f), 1.5f, LightIntensity(0.6f,0.1f,0));
-	
+
 	scene.Add(&sp1);
 	scene.Add(&sp2);
 	scene.Add(&sp3);
@@ -172,7 +172,7 @@ void	Zadania::RunZad3()
 	//{
 	//	printf("\n\nIntersedted : distance = %f", dist0);
 	//}
-	
+
 }
 
 void	Zadania::RunZad4()
@@ -187,9 +187,9 @@ void	Zadania::RunZad4()
 	PointLight	light2 = PointLight(Vector(1000, -1000, -200), LightIntensity(1, 0,	0), 100);
 
 	scene.Add(&sp);
-	scene.Add(&light1); 
+	scene.Add(&light1);
 	scene.Add(&light2);
-	
+
 	camPersp.Render(scene, picture);
 	picture.PrintToFile("zad4.bmp");
 
@@ -239,19 +239,65 @@ void	Zadania::RunZad5()
 
 void	Zadania::RunZad6()
 {
+
 	Scene scene = Scene();
-	Sphere	sp = Sphere(Vector(0, 0, 0), 1, LightIntensity(0.1f, 0.1f, 0.1f), 0);
-	CameraPerspective camPersp = CameraPerspective(Vector(0, 0, -1.5f), Vector(0, 0, 1), 100000000000, 1, 1);
-	Picture picture = Picture(64, 64);
+	CameraPerspective camPersp = CameraPerspective(Vector(0, -2.5f, -2.5f), Vector(0, 0, 1), 100000000000, 1, 1, 0);
+	Picture picture = Picture(128, 128);
 
-	PointLight	light1 = PointLight(Vector(0, 1000.2f, 1000), LightIntensity(1, 1, 1), 10);
-	Material	material1 = Material(LightIntensity(0.3f, 0.3f, 0.3f), LightIntensity(0.5f, 0.5f, 0.5f), LightIntensity(0.0f, 1.0f, 0.9f), 32, MaterialType::Diffuse);
+	PointLight	light1 = PointLight(Vector(0, 4, 0), LightIntensity(1, 1, 1), 9);
+	Material	material1 = Material(LightIntensity(0.3f, 0.3f, 0.3f), LightIntensity(0.5f, 0.5f, 0.5f), LightIntensity(0.0f, 1.0f, 0.9f), 32, MaterialType::Refractive	);
+	Material	material2 = Material(LightIntensity(0.3f, 0.3f, 0.3f), LightIntensity(0.5f, 0.5f, 0.5f), LightIntensity(1.0f, 1.0f, 0.9f), 32, MaterialType::Diffuse);
+	Material	material3 = Material(LightIntensity(0.3f, 0.3f, 0.3f), LightIntensity(0.5f, 0.0f, 0.5f), LightIntensity(1.0f, 1.0f, 0.9f), 10, MaterialType::Diffuse);
+	Material	materialRed = Material(LightIntensity(0.3f, 0, 0), LightIntensity(0.5f, 0, 0), LightIntensity(1.0f, 0, 0), 10, MaterialType::Diffuse);
+	Material	materialBlue = Material(LightIntensity(0, 0, 0.3f), LightIntensity(0, 0, 0.5f), LightIntensity(0, 0, 1), 10, MaterialType::Diffuse);
+	Material	materialBlack = Material(LightIntensity(0, 0, 0), LightIntensity(0, 0, 0), LightIntensity(0, 0, 0), 10, MaterialType::Diffuse);
+	Material	materialCeiling = Material(LightIntensity(.6f, 0.6f, 0.6f), LightIntensity(0, 0, 0), LightIntensity(0, 0, 0), 10, MaterialType::Haxative);
+	Material	materialRefl = Material(LightIntensity(0.3f, 0.3f, 0.3f), LightIntensity(0.5f, 0.5f, 0.5f), LightIntensity(0.0f, 1.0f, 0.9f), 32, MaterialType::Reflective);
 
-	scene.Add(&sp);
+	Sphere	sp	= Sphere(Vector(0, 0, 0), 0.2f, LightIntensity(0.1f, 0.1f, 0.1f), 0);
+	Sphere	sp1	= Sphere(Vector(1.2f, -2.8f, 0), .8f, LightIntensity(0.1f, 0.1f, 0.1f), 0);
+	Sphere	sp2 = Sphere(Vector(-0.5f, -2.8f, 1), .8f, LightIntensity(0.1f, 0.1f, 0.1f), 5);
+	Sphere	sp3 = Sphere(Vector(3, -1, 3.1f), 0.3f, LightIntensity(0.1f, 0.1f, 0.1f), 2);
+	Sphere	sp4 = Sphere(Vector(0, -10004, 0), 100000000, LightIntensity(0.1f, 0.1f, 0.1f), 1);
+	Sphere	sp5 = Sphere(Vector(0, 10004, 0), 100000000, LightIntensity(0.1f, 0.1f, 0.1f), 7);
+	Sphere	sp6 = Sphere(Vector(-10004, 0, 0), 100000000, LightIntensity(0.1f, 0.1f, 0.1f), 3);
+	Sphere	sp7 = Sphere(Vector(10004, 0, 0), 100000000, LightIntensity(0.1f, 0.1f, 0.1f), 4);
+	Sphere	sp8 = Sphere(Vector(0, 0, 10004), 100000000, LightIntensity(0.1f, 0.1f, 0.1f), 1);
+	Sphere	sp9 = Sphere(Vector(0, 0, -10008), 100000000, LightIntensity(0.1f, 0.1f, 0.1f), 6);
+
+	//scene.Add(&sp);
+	scene.Add(&sp1);
+	scene.Add(&sp2);
+	scene.Add(&sp3);
+	scene.Add(&sp4);
+	scene.Add(&sp5);
+	scene.Add(&sp6);
+	scene.Add(&sp7);
+	scene.Add(&sp8);
+	scene.Add(&sp9);
 	scene.Add(&light1);
 	scene.Add(&material1);
+	scene.Add(&material2);
+	scene.Add(&material3);
+	scene.Add(&materialRed);
+	scene.Add(&materialBlue);
+	scene.Add(&materialRefl);
+	scene.Add(&materialBlack);
+	scene.Add(&materialCeiling);
+
+
+	Vector	tempMath = Vector(0);
+	float	tempFloat = 0;
+	int		tempInt = 0;
+	sp.IntersectWithBackfaces(Ray(Vector(0, 0, 0.1f), 1000000, Vector(0, 0, 1)), tempMath);
+	tempInt = sp.IntersectDistance(Ray(Vector(0, 0, 0), 1000000, Vector(0, 0, 1)), tempFloat);
+	tempMath.PrintNL();
+	printf("dist : %f with hits %i", tempFloat, tempInt);
+
 
 	camPersp.Render(scene, picture);
 	picture.PrintToFile("zad6.bmp");
+
+
 
 }

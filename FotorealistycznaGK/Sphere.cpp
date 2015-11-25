@@ -50,6 +50,29 @@ int		Sphere::IntersectDistance(Ray ray, float &distance)
 	return retval;
 }
 
+int Sphere::IntersectWithBackfaces(Ray ray, Vector & intersection)
+{
+	Vector v = ray.origin - center;
+	float b = -v.Dot(ray.direction);
+	float det = (b * b) + radius;
+	int retval = __HIT_MISS;
+	if (det > 0)
+	{
+		det = sqrtf(det);
+		float i1 = b - det;
+		float i2 = b + det;
+		if (i2 > 0)
+		{
+			if (i1 < 0)
+			{
+				intersection = ray.origin + ray.direction * i2;
+				retval = __HIT_ONE;
+			}
+		}
+	}
+	return retval;
+}
+
 void Sphere::ComputeUV(int & u, int & v, Vector hit, int size)
 {
 	Vector local = Vector(hit - center);

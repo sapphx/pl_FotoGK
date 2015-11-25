@@ -24,6 +24,7 @@ public:
 	int		Intersect(Ray ray, float &distance, Vector& intesect1, Vector& intesect2 = Vector());
 
 	virtual	int		IntersectDistance(Ray ray, float& distance);
+	virtual int		IntersectWithBackfaces(Ray ray, Vector& intersection);
 
 	virtual Vector	GetNormal(Vector point) { return (point - center).NormalizeProduct(); }
 

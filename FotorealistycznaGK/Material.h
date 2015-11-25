@@ -8,7 +8,8 @@ enum MaterialType
 {
 	Diffuse = 0,
 	Reflective,
-	Refractive
+	Refractive,
+	Haxative
 };
 
 class Material
@@ -21,7 +22,7 @@ public:
 	MaterialType	materialType;
 	//float	kDiffuse;
 	//float	kSpecular;
-	
+
 	Picture*		texture;
 	int				texSize;
 
